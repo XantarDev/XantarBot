@@ -1,0 +1,27 @@
+name: Publish Tweet
+
+on:
+  workflow_dispatch:
+    
+  schedule:
+   - cron: '0 9,21 * * *'
+   
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+    - name: Run exe
+      env:
+        CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+        CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        ACCESS_SECRET: ${{ secrets.ACCESS_SECRET }}
+      run: ./exe/XantarBot.exe $CONSUMER_KEY $CONSUMER_SECRET $ACCESS_TOKEN $ACCESS_SECRET
