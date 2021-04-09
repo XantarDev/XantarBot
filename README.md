@@ -5,8 +5,15 @@ The data area reading from [@DataDista](https://github.com/datadista) in your pr
 ## Debug
 Open with VS Code and press F5 😉
 
-## Run
-.\exe\XantarBot.exe CONSUMER_KEY CONSUMER_SECRET ACCESS_TOKEN ACCESS_SECRET
-
 ## Publish 
 dotnet publish .\XantarBot.csproj -o exe
+
+## Run
+``` 
+.\exe\XantarBot.exe CONSUMER_KEY CONSUMER_SECRET ACCESS_TOKEN ACCESS_SECRET
+```
+other option:
+```
+dotnet run .\exe\XantarBot.dll CONSUMER_KEY CONSUMER_SECRET ACCESS_TOKEN ACCESS_SECRET
+```
+
