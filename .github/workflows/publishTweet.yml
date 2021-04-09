@@ -18,10 +18,17 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: dotnet publish
+      run: dotnet publish -o dotnetcorepublish    
     - name: Run exe
       env:
         CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
         CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         ACCESS_SECRET: ${{ secrets.ACCESS_SECRET }}
-      run: ./exe/XantarBot.exe $CONSUMER_KEY $CONSUMER_SECRET $ACCESS_TOKEN $ACCESS_SECRET
+      # run: dotnet run ./exe/XantarBot.exe $CONSUMER_KEY $CONSUMER_SECRET $ACCESS_TOKEN $ACCESS_SECRET
+      run: dotnet run ./dotnetcorepublish/XantarBot.dll $CONSUMER_KEY $CONSUMER_SECRET $ACCESS_TOKEN $ACCESS_SECRET
