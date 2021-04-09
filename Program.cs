@@ -26,11 +26,17 @@ namespace XantarBot
 
         static void Main(string[] args)
         {
-            var CONSUMER_KEY = args.ElementAtOrDefault(0) ?? _CONSUMER_KEY; 
-            var CONSUMER_SECRET = args.ElementAtOrDefault(1) ?? _CONSUMER_SECRET; 
-            var ACCESS_TOKEN = args.ElementAtOrDefault(2) ?? _ACCESS_TOKEN; 
-            var ACCESS_SECRET = args.ElementAtOrDefault(3) ?? _ACCESS_SECRET; 
-            
+            var i= 0;
+            if(args.Count() == 4)
+                i = 0;
+            else
+                i = 1;
+                
+            var CONSUMER_KEY = args.ElementAtOrDefault(i++) ?? _CONSUMER_KEY; 
+            var CONSUMER_SECRET = args.ElementAtOrDefault(i++) ?? _CONSUMER_SECRET; 
+            var ACCESS_TOKEN = args.ElementAtOrDefault(i++) ?? _ACCESS_TOKEN; 
+            var ACCESS_SECRET = args.ElementAtOrDefault(i++) ?? _ACCESS_SECRET; 
+
             var client = new TwitterClient(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_SECRET);
             var user = client.Users.GetAuthenticatedUserAsync().Result;
 
