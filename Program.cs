@@ -37,6 +37,13 @@ namespace XantarBot
             var ACCESS_TOKEN = args.ElementAtOrDefault(i++) ?? _ACCESS_TOKEN; 
             var ACCESS_SECRET = args.ElementAtOrDefault(i++) ?? _ACCESS_SECRET; 
 
+            Console.WriteLine($"");
+            Console.WriteLine($"CONSUMER_KEY: {CONSUMER_KEY.Substring(0,5)}");
+            Console.WriteLine($"CONSUMER_SECRET: {CONSUMER_SECRET.Substring(0,5)}");
+            Console.WriteLine($"ACCESS_TOKEN: {ACCESS_TOKEN.Substring(0,5)}");
+            Console.WriteLine($"ACCESS_SECRET: {ACCESS_SECRET.Substring(0,5)}");
+            Console.WriteLine($"");
+            
             var client = new TwitterClient(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_SECRET);
             var user = client.Users.GetAuthenticatedUserAsync().Result;
 
