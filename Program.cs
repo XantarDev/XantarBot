@@ -2,6 +2,7 @@
 using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -18,53 +19,45 @@ namespace XantarBot
 
         const string CSV = "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_vacunas.csv";
 
-        const string _CONSUMER_KEY = "WRITE HERE CONSUMER_KEY";
-        const string _CONSUMER_SECRET = "WRITE HERE _CONSUMER_SECRET";
-        const string _ACCESS_TOKEN = "WRITE HERE _ACCESS_TOKEN";
-        const string _ACCESS_SECRET = "WRITE HERE _ACCESS_SECRET";
-       
+        const string CONSUMER_KEY = "WRITE HERE CONSUMER_KEY";
+        const string CONSUMER_SECRET = "WRITE HERE CONSUMER_SECRET";
+        const string ACCESS_TOKEN = "WRITE HERE ACCESS_TOKEN";
+        const string ACCESS_SECRET = "WRITE HERE ACCESS_SECRET";
 
         static void Main(string[] args)
         {
-            var i= 0;
-            if(args.Count() == 4)
-                i = 0;
-            else
-                i = 1;
-                
-            var CONSUMER_KEY = args.ElementAtOrDefault(i++) ?? _CONSUMER_KEY; 
-            var CONSUMER_SECRET = args.ElementAtOrDefault(i++) ?? _CONSUMER_SECRET; 
-            var ACCESS_TOKEN = args.ElementAtOrDefault(i++) ?? _ACCESS_TOKEN; 
-            var ACCESS_SECRET = args.ElementAtOrDefault(i++) ?? _ACCESS_SECRET; 
-            
-            var client = new TwitterClient(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_SECRET);
+            int i = args.Count() == 4 ? 0 : 1;
+            string consumerKey = args.ElementAtOrDefault(i++) ?? CONSUMER_KEY;
+            string consumerSecret = args.ElementAtOrDefault(i++) ?? CONSUMER_SECRET;
+            string accessToken = args.ElementAtOrDefault(i++) ?? ACCESS_TOKEN;
+            string accessSecret = args.ElementAtOrDefault(i++) ?? ACCESS_SECRET;
+
+            var client = new TwitterClient(consumerKey, consumerSecret, accessToken, accessSecret);
             var user = client.Users.GetAuthenticatedUserAsync().Result;
 
-            var lastUpdate = Regex.Match(user.GetHomeTimelineAsync().Result.FirstOrDefault().Text, @"\[(.*?)\]").Groups[1].Value;
-            var vaccination = GetVaccination();
-            
-            if (Convert.ToDateTime(lastUpdate, new CultureInfo("es-ES")) < vaccination.Date)
-            {
-                var progressBar = new string(FULL, (int)vaccination.Percentage / 5) + new string(EMPTY, 20 - ((int)vaccination.Percentage / 5));
-                var textTweet = $"[{vaccination.Date.ToString("dd/MM/yyyy")}] {vaccination.Percentage}%\n{progressBar}";
-                _ = user.PublishTweetAsync(textTweet).Result;
+            DateTime lastUpdate = Convert.ToDateTime(Regex.Match(user.GetHomeTimelineAsync().Result.FirstOrDefault().Text, @"\[(.*?)\]").Groups[1].Value, new CultureInfo("es-ES"));
+            List<Vaccination> vaccinations = GetVaccinations(lastUpdate);
 
-                Console.WriteLine($"Tweet published: {textTweet}");
-            }
-            else
-            {
-                Console.WriteLine($"No updated data. Try again later.");
-            }
+            if (vaccinations.Any())
+                foreach (var vaccination in vaccinations.OrderBy(v => v.Date))
+                {
+                    var progressBar = new string(FULL, (int)vaccination.Percentage / 5) + new string(EMPTY, 20 - ((int)vaccination.Percentage / 5));
+                    var tweet = $"[{vaccination.Date.ToString("dd/MM/yyyy")}] {vaccination.Percentage}%\n{progressBar}";
+                    _ = user.PublishTweetAsync(tweet).Result;
+
+                    Console.WriteLine($"Tweet published: {tweet}");
+                }
+            else Console.WriteLine($"No updated data. Try again later.");
         }
 
-        private static Vaccination GetVaccination()
+        private static List<Vaccination> GetVaccinations(DateTime lastUpdate)
         {
             using (var client = new WebClient())
             {
                 string data = client.DownloadString(CSV);
 
                 using (var csvReader = new CsvReader(new StringReader(data), new CsvConfiguration(new CultureInfo("es-ES")) { Delimiter = "," }))
-                    return csvReader.GetRecords<Vaccination>().Where(v => v.Area == "España").OrderByDescending(v => v.Date).First();
+                    return csvReader.GetRecords<Vaccination>().Where(v => v.Area == "España" && v.Date > lastUpdate).OrderByDescending(v => v.Date).ToList();
             }
         }
     }
