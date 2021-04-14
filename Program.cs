@@ -35,7 +35,7 @@ namespace XantarBot
             var client = new TwitterClient(consumerKey, consumerSecret, accessToken, accessSecret);
             var user = client.Users.GetAuthenticatedUserAsync().Result;
 
-            DateTime lastUpdate = Convert.ToDateTime(Regex.Match(user.GetHomeTimelineAsync().Result.FirstOrDefault().Text, @"\[(.*?)\]").Groups[1].Value, new CultureInfo("es-ES"));
+            DateTime lastUpdate = Convert.ToDateTime(Regex.Match(user.GetUserTimelineAsync().Result.FirstOrDefault().Text, @"\[(.*?)\]").Groups[1].Value, new CultureInfo("es-ES"));
             List<Vaccination> vaccinations = GetVaccinations(lastUpdate);
 
             if (vaccinations.Any())
