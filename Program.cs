@@ -42,7 +42,7 @@ namespace XantarBot
                 foreach (var vaccination in vaccinations.OrderBy(v => v.Date))
                 {
                     var progressBar = new string(FULL, (int)vaccination.Percentage / 5) + new string(EMPTY, 20 - ((int)vaccination.Percentage / 5));
-                    var tweet = $"[{vaccination.Date.ToString("dd/MM/yyyy")}] {vaccination.Percentage}% #COVID19\n{progressBar}";
+                    var tweet = $"[{vaccination.Date.ToString("dd/MM/yyyy")}] {vaccination.Percentage}% #COVID19 #VacunaCOVID19\n{progressBar}";
                     _ = user.PublishTweetAsync(tweet).Result;
 
                     Console.WriteLine($"Tweet published: {tweet}");
